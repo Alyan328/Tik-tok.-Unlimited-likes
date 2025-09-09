@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alyanpanel.com - Multi TikTok Player</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin: 20px;
+        background-color: #111;
+        color: #fff;
+    }
+    h1 { color: #FFD700; }
+    .powered {
+        color: #FFD700;
+        font-weight: bold;
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+    input, select {
+        padding: 10px;
+        margin: 10px;
+        width: 80%;
+        max-width: 400px;
+        border: 2px solid #FFD700;
+        border-radius: 5px;
+        background-color: #222;
+        color: #fff;
+        font-size: 16px;
+    }
+    button {
+        padding: 8px 18px;
+        margin: 5px;
+        background-color: #FFD700;
+        color: #111;
+        border: none;
+        border-radius: 5px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover { background-color: #e6c200; }
+    .video-card {
+        display: inline-block;
+        margin: 10px;
+        border: 3px solid #FFD700;
+        border-radius: 8px;
+        overflow: hidden;
+        background-color: #222;
+        vertical-align: top;
+        padding: 5px;
+    }
+    .stats {
+        color: #FFD700;
+        margin-top: 5px;
+        font-size: 14px;
+    }
+    .controls {
+        margin-top: 5px;
+    }
+    .whatsapp-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: #25D366;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-size: 18px;
+        transition: 0.3s;
+    }
+    .whatsapp-link i { margin-right: 8px; }
+    .whatsapp-link:hover { background-color: #128C7E; }
+</style>
+</head>
+<body>
+
+<h1>Multi TikTok Player</h1>
+<p>Advanced Multi-Stream TikTok Interface</p>
+<p class="powered">Powered by Alyanpanel.com</p>
+
+<input type="text" id="videoLink" placeholder="Enter TikTok Video Link">
+<br>
+
+<select id="videoCount">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <!-- Add up to 100 as needed -->
+    <option value="100">100</option>
+</select>
+<br>
+
+<!-- Global Play/Pause All Buttons -->
+<button onclick="playAll()">▶ Play All</button>
+<button onclick="pauseAll()">⏸ Pause All</button>
+<br>
+
+<button onclick="initializeStreams()">Initialize Streams</button>
+<br>
+<div id="streams"></div>
+
+<a class="whatsapp-link" href="https://chat.whatsapp.com/channel/0029VbBKdlxHwXb9897wWb1T" target="_blank">
+    <i class="fab fa-whatsapp"></i> Join WhatsApp Channel
+</a>
+
+<script>
+let tiktokFrames = [];
+
+function getTikTokID(url) {
+    const match = url.match(/\/video\/(\d+)/);
+    return match ? match[1] : null;
+}
+
+function getRandomStats() {
+    const views = Math.floor(Math.random() * 99 + 2); // 2 - 100
+    const likes = Math.floor(Math.random() * 99 + 2); // 2 - 100
+    const followers = Math.floor(Math.random() * 50 + 1); // 1 - 50
+    return { views, likes, followers };
+}
+
+function initializeStreams() {
+    const videoLink = document.getElementById('videoLink').value;
+    const videoCount = parseInt(document.getElementById('videoCount').value);
+    const container = document.getElementById('streams');
+    container.innerHTML = '';
+    tiktokFrames = [];
+
+    const videoID = getTikTokID(videoLink);
+    if (!videoID) {
+        alert("Invalid TikTok URL");
+        return;
+    }
+
+    for (let i = 0; i < videoCount; i++) {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+
+        const iframe = document.createElement('iframe');
+        iframe.src = `https://www.tiktok.com/embed/${videoID}`;
+        iframe.width = "325";
+        iframe.height = "580";
+        iframe.allow = "autoplay; fullscreen";
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allowfullscreen', '');
+        card.appendChild(iframe);
+        tiktokFrames.push(iframe);
+
+        const statsDiv = document.createElement('div');
+        statsDiv.className = 'stats';
+        const stats = getRandomStats();
+        statsDiv.innerHTML = `<i class="fas fa-eye"></i> ${stats.views} &nbsp; <i class="fas fa-heart"></i> ${stats.likes} &nbsp; <i class="fas fa-user"></i> ${stats.followers} Followers`;
+        card.appendChild(statsDiv);
+
+        const controlsDiv = document.createElement('div');
+        controlsDiv.className = 'controls';
+
+        const playBtn = document.createElement('button');
+        playBtn.textContent = '▶ Play';
+        playBtn.onclick = () => iframe.contentWindow.postMessage({ method: 'play' }, '*');
+
+        const pauseBtn = document.createElement('button');
+        pauseBtn.textContent = '⏸ Pause';
+        pauseBtn.onclick = () => iframe.contentWindow.postMessage({ method: 'pause' }, '*');
+
+        const muteBtn = document.createElement('button');
+        muteBtn.textContent = '🔇 Mute';
+        muteBtn.onclick = () => iframe.contentWindow.postMessage({ method: 'mute' }, '*');
+
+        const unmuteBtn = document.createElement('button');
+        unmuteBtn.textContent = '🔊 Unmute';
+        unmuteBtn.onclick = () => iframe.contentWindow.postMessage({ method: 'unmute' }, '*');
+
+        controlsDiv.appendChild(playBtn);
+        controlsDiv.appendChild(pauseBtn);
+        controlsDiv.appendChild(muteBtn);
+        controlsDiv.appendChild(unmuteBtn);
+
+        card.appendChild(controlsDiv);
+        container.appendChild(card);
+    }
+}
+
+// Global
